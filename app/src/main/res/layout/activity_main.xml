@@ -6,13 +6,84 @@
     android:layout_height="match_parent"
     tools:context="arm.man.gunmen.MainActivity">
 
-    <TextView
+    <!--<TextView-->
+    <!--android:id="@+id/text_map"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--app:layout_constraintLeft_toLeftOf="parent"-->
+    <!--app:layout_constraintRight_toRightOf="parent"-->
+    <!--app:layout_constraintTop_toTopOf="parent" />-->
+
+    <LinearLayout
+        android:id="@+id/layout_map"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/text_map"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/text_solutions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/solution_count"
+        android:textAppearance="@android:style/TextAppearance.Large" />
+
+    <TextView
+        android:id="@+id/text_gunmen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/gunmen_count"
+        app:layout_constraintTop_toBottomOf="@id/text_solutions" />
+
+    <Button
+        android:id="@+id/button_init"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="initialize"
+        android:text="@string/initialize"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <Button
+        android:id="@+id/button_calculate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="calculate"
+        android:text="@string/calculate"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <Button
+        android:id="@+id/button_browse_solutions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="browseSolution"
+        android:text="Browse results"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <Button
+        android:id="@+id/button_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="cancelCalculate"
+        android:text="Cancel"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <EditText
+        android:id="@+id/edit_delay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Delay"
+        android:inputType="number"
+        android:text="500"
+        app:layout_constraintRight_toRightOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

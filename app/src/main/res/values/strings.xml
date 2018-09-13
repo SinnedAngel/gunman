@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Gunmen</string>
+    <string name="solution_count">Solutions=%d</string>
+    <string name="gunmen_count">Gunmen=%d</string>
+    <string name="initialize">Initialize</string>
+    <string name="calculate">Calculate</string>
+    <string name="input_width">Input Width</string>
+    <string name="input_height">Input Height</string>
+    <string name="done">Done</string>
 </resources>
