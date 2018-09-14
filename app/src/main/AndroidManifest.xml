@@ -19,7 +19,16 @@
         <activity android:name=".InitSizeActivity" />
         <activity android:name=".InitMapActivity" />
         <activity android:name=".SolutionBrowserActivity" />
-        <activity android:name=".SolutionViewerActivity"></activity>
+        <activity android:name=".SolutionViewerActivity" />
+
+        <service
+            android:name=".CalculateIntentService"
+            android:exported="false" />
+
+        <receiver
+            android:name=".CalculateReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
     </application>
 
 </manifest>

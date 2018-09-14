@@ -1,6 +1,7 @@
 package arm.man.gunmen;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -58,11 +59,19 @@ public class MainActivity extends AppCompatActivity {
 
     private MapGenV2 mMapGen;
 
+    private CalculateReceiver mCalculateReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        IntentFilter intentFilter = new IntentFilter(CalculateReceiver.ACTION_GUNMEN_PROGRESS);
+        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+
+        mCalculateReceiver = new CalculateReceiver();
+        registerReceiver(mCalculateReceiver, intentFilter);
     }
 
     public void initialize(View view) {
@@ -119,9 +128,17 @@ public class MainActivity extends AppCompatActivity {
         mMapGen.execute(mMap);
     }
 
+    public void calculateService(View view) {
+
+    }
+
     public void cancelCalculate(View view) {
         if (mMapGen != null)
             mMapGen.cancel(true);
+
+        buttonInit.setEnabled(true);
+        buttonCalculate.setVisibility(View.VISIBLE);
+        buttonCancel.setVisibility(View.INVISIBLE);
     }
 
     public void showResult(int maxSolution, int maxGunMen) {
@@ -216,6 +233,18 @@ public class MainActivity extends AppCompatActivity {
         textViewSolutions.setText(getString(R.string.solution_count, 0));
         textViewGunMen.setText(getString(R.string.gunmen_count, 0));
         buttonBrowseSolutions.setVisibility(View.GONE);
+    }
+
+    private String parseMap() {
+        String stringMap = "";
+
+        for (int i = 0; i < mHeight; i++) {
+            for (int j = 0; j < mWidth; j++) {
+                stringMap += mMap[j][i];
+            }
+        }
+
+        return stringMap;
     }
 
     @Override
