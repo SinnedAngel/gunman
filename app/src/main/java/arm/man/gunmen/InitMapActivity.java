@@ -32,9 +32,16 @@ public class InitMapActivity extends AppCompatActivity {
         if (extras != null) {
             mWidth = extras.getInt(EXTRA_WIDTH);
             mHeight = extras.getInt(EXTRA_HEIGHT);
-        }
 
-        generateMap();
+            generateMap();
+
+            String mapString = extras.getString(EXTRA_MAP);
+            if(mapString!=null){
+                int[][] map = parseMap(mapString);
+
+                drawMap(map);
+            }
+        }
     }
 
     private void generateMap() {
@@ -52,6 +59,30 @@ public class InitMapActivity extends AppCompatActivity {
             }
 
             layoutMap.addView(linearLayout);
+        }
+    }
+
+    private void drawMap(int[][] map) {
+        for (int i = 0; i < mHeight; i++) {
+
+            View row = layoutMap.getChildAt(i);
+            if (row instanceof LinearLayout) {
+                LinearLayout layoutRow = (LinearLayout) row;
+
+                for (int j = 0; j < mWidth; j++) {
+                    View col = layoutRow.getChildAt(j);
+                    if (col instanceof CheckBox) {
+                        CheckBox checkBox = (CheckBox) col;
+                        int state = map[j][i];
+
+                        if (state == BlockType.BLOCK_EMPTY) {
+                            checkBox.setChecked(false);
+                        } else if (state == BlockType.BLOCK_WALL) {
+                            checkBox.setChecked(true);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -85,5 +116,20 @@ public class InitMapActivity extends AppCompatActivity {
         }
 
         return stringMap;
+    }
+
+    private int[][] parseMap(String mapString) {
+        int[][] map = new int[mWidth][mHeight];
+
+        int index = 0;
+        for (int i = 0; i < mHeight; i++) {
+            for (int j = 0; j < mWidth; j++) {
+                String stateString = mapString.substring(index, index + 1);
+                map[j][i] = Integer.valueOf(stateString);
+                index++;
+            }
+        }
+
+        return map;
     }
 }

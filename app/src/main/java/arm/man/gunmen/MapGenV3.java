@@ -23,12 +23,6 @@ public class MapGenV3 {
 
     private Listener mListener;
 
-    private int mDelay = 500;
-
-    public void setDelay(int delay) {
-        mDelay = delay;
-    }
-
     public MapGenV3(@NonNull Listener listener) {
         mListener = listener;
     }
@@ -43,12 +37,24 @@ public class MapGenV3 {
         Position startPosition = new Position(0, 0);
         next(startPosition);
 
-        if (mListener != null)
-            mListener.onFinished(mMaxGunmen, mSolutions.size(), mSolutions);
+        if (mListener != null) {
+            if (ThreadState.isRequestCancel)
+                mListener.onCanceled();
+            else
+                mListener.onFinished(mMaxGunmen, mSolutions.size(), mSolutions);
+        }
     }
 
     private void next(Position position) {
-        int state = check(position.x, position.y);
+
+        if (ThreadState.isRequestCancel)
+            return;
+
+        while (ThreadState.isPaused) {
+
+        }
+
+        int state = checkBack(position.x, position.y);
 
         if (state == STATE_NOT_ALLOWED) {
             Position nextPosition = position.next();
@@ -67,14 +73,16 @@ public class MapGenV3 {
             else
                 addSolution();
 
-            if (state == STATE_ALLOWED) {
-                input(position, BlockType.BLOCK_EMPTY);
+//            if (state == STATE_ALLOWED) {
+            input(position, BlockType.BLOCK_EMPTY);
 
+            if (canBeEmptied(position.x, position.y)) {
                 if (nextPosition != null)
                     next(nextPosition);
                 else
                     addSolution();
             }
+//            }
         }
     }
 
@@ -99,7 +107,38 @@ public class MapGenV3 {
             mListener.onProgress(mMap, mSolutions.size(), mMaxGunmen);
     }
 
-    private int check(int x, int y) {
+//    private int check(int x, int y) {
+//        if (mMap[x][y] == BlockType.BLOCK_WALL)
+//            return STATE_NOT_ALLOWED;
+//        else {
+//            final int upState = checkUp(x, y);
+//
+//            if (upState == STATE_NOT_ALLOWED)
+//                return upState;
+//            else {
+//                final int rightState = checkRight(x, y);
+//
+//                if (rightState == STATE_NOT_ALLOWED)
+//                    return rightState;
+//                else {
+//                    final int downState = checkDown(x, y);
+//
+//                    if (downState == STATE_NOT_ALLOWED)
+//                        return downState;
+//                    else {
+//                        final int leftState = checkLeft(x, y);
+//
+//                        if ((leftState == STATE_MUST && rightState == STATE_MUST) || (upState == STATE_MUST && downState == STATE_MUST))
+//                            return STATE_MUST;
+//                        else
+//                            return leftState;
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+    private int checkBack(int x, int y) {
         if (mMap[x][y] == BlockType.BLOCK_WALL)
             return STATE_NOT_ALLOWED;
         else {
@@ -108,36 +147,112 @@ public class MapGenV3 {
             if (upState == STATE_NOT_ALLOWED)
                 return upState;
             else {
-                final int rightState = checkRight(x, y);
+                final int leftState = checkLeft(x, y);
 
-                if (rightState == STATE_NOT_ALLOWED)
-                    return rightState;
+                if (leftState == STATE_NOT_ALLOWED)
+                    return leftState;
                 else {
-                    final int downState = checkDown(x, y);
-
-                    if (downState == STATE_NOT_ALLOWED)
-                        return downState;
-                    else {
-                        final int leftState = checkLeft(x, y);
-
-                        if (leftState == STATE_MUST) {
-                            if (upState == STATE_MUST && rightState == STATE_MUST && downState == STATE_MUST)
-                                return STATE_MUST;
-                            else
-                                return STATE_ALLOWED;
-                        } else
-                            return leftState;
-                    }
+                    return STATE_ALLOWED;
                 }
             }
         }
     }
 
     private boolean canBeEmptied(int x, int y) {
-        if (checkRight(x, y) == STATE_MUST && checkDown(x, y) == STATE_MUST)
-            return false;
-        return true;
+        if (canBeEmptiedRight(x, y))
+            return true;
+        else if (canBeEmptiedDown(x, y)) //&& isEdgeHorizontal(x, y)) {
+            return true;
+//        }
+        return false;
+
+//        return (canBeEmptiedRight(x, y) || isEdgeHorizontal(x, y)) && canBeEmptiedDown(x, y);
+
+//        if (x >= mMaxX) {
+//            if (mMap[x - 1][y] == BlockType.BLOCK_WALL)
+//                return canBeEmptiedDown(x, y);
+//            else
+//                return false;
+//        }
+//
+//        int count = 0;
+//        for (int i = x + 1; i <= mMaxX; i++) {
+//            if (mMap[i][y] == BlockType.BLOCK_WALL && count == 0) {
+//                if (x == 0 || mMap[x - 1][y] == BlockType.BLOCK_WALL)
+//                    return canBeEmptiedDown(x, y);
+//                else
+//                    return false;
+//            } else if (checkUp(i, y) != STATE_NOT_ALLOWED)
+//                return true;
+//
+//            count++;
+//        }
+//        return false;
     }
+
+    private boolean canBeEmptiedRight(int x, int y) {
+//        if (x < mMaxX && mMap[x + 1][y] == BlockType.BLOCK_EMPTY)
+//            return true;
+//        return false;
+
+        if (x >= mMaxX)
+            return false;
+
+        int count = 0;
+        for (int i = x + 1; i <= mMaxX; i++) {
+            if (mMap[i][y] == BlockType.BLOCK_WALL && count == 0)
+                return false;
+            else if (checkUp(i, y) != STATE_NOT_ALLOWED)
+                return true;
+
+            count++;
+        }
+        return false;
+    }
+
+//    private boolean canBeEmptiedDown(int x, int y) {
+//        if (y >= mMaxY)
+//            return false;
+//
+//        int count = 0;
+//        for (int i = y + 1; i <= mMaxY; i++) {
+//            if (mMap[x][i] == BlockType.BLOCK_WALL && count == 0)
+//                return false;
+//            else if (checkLeft(x, i) != STATE_NOT_ALLOWED)
+//                return true;
+//
+//            count++;
+//        }
+//
+//        return false;
+//    }
+
+//    private boolean canBeEmptiedDown(int x, int y) {
+//        if (y < mMaxY && mMap[x][y + 1] == BlockType.BLOCK_EMPTY)
+//            return true;
+//        return false;
+//    }
+
+    private boolean canBeEmptiedDown(int x, int y) {
+        if (y < mMaxY && mMap[x][y + 1] == BlockType.BLOCK_EMPTY)
+            return true;
+        return false;
+    }
+
+    private boolean isEdgeHorizontal(int x, int y) {
+        if (mMaxX == 0 ||
+                (x == 0 && mMap[x + 1][y] == BlockType.BLOCK_WALL) ||
+                (x == mMaxX && mMap[x - 1][y] == BlockType.BLOCK_WALL) ||
+                (mMap[x - 1][y] == BlockType.BLOCK_WALL && mMap[x + 1][y] == BlockType.BLOCK_WALL))
+            return true;
+        return false;
+    }
+
+//    private boolean canBeEmptied(int x, int y) {
+//        if (checkRight(x, y) == STATE_MUST && checkDown(x, y) == STATE_MUST)
+//            return false;
+//        return true;
+//    }
 
     private int checkDown(int x, int y) {
         int count = 0;
@@ -221,8 +336,12 @@ public class MapGenV3 {
         for (int i = 0; i <= mMaxY; i++) {
             for (int j = 0; j <= mMaxX; j++) {
                 if (mMap[j][i] == BlockType.BLOCK_EMPTY)
-                    if (!checkParity(j, i))
+                    if (!checkParity(j, i)) {
+                        if (mListener != null)
+                            mListener.onParityFailed();
+
                         return false;
+                    }
             }
         }
         return true;
@@ -278,9 +397,9 @@ public class MapGenV3 {
         if (mListener != null)
             mListener.onProgress(mMap, mSolutions.size(), mMaxGunmen);
 
-        if (mDelay > 0) {
+        if (ThreadState.delay > 0) {
             try {
-                Thread.sleep(mDelay);
+                Thread.sleep(ThreadState.delay);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -316,5 +435,9 @@ public class MapGenV3 {
         void onProgress(int[][] solution, int solutionCount, int maxGunmen);
 
         void onFinished(int maxGunmen, int maxSolution, ArrayList<String> solutions);
+
+        void onCanceled();
+
+        void onParityFailed();
     }
 }

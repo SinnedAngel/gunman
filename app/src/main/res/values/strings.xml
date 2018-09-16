@@ -2,9 +2,18 @@
     <string name="app_name">Gunmen</string>
     <string name="solution_count">Solutions=%d</string>
     <string name="gunmen_count">Gunmen=%d</string>
-    <string name="initialize">Initialize</string>
+    <string name="initialize_size">Init Size</string>
+    <string name="initialize_map">Init Map</string>
     <string name="calculate">Calculate</string>
     <string name="input_width">Input Width</string>
     <string name="input_height">Input Height</string>
     <string name="done">Done</string>
+    <string name="parity_fail">Parity Fail=%d</string>
+    <string name="pause">Pause</string>
+    <string name="cont">Continue</string>
+    <string name="set_delay">Set</string>
+    <string name="add_delay">+</string>
+    <string name="reduce_delay">-</string>
+    <string name="notification_channel_name">GunMen</string>
+    <string name="notification_channel_description">Notification channel for GunMen progress</string>
 </resources>

@@ -24,6 +24,15 @@ public class InitSizeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_init_size);
         ButterKnife.bind(this);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            int width = extras.getInt(EXTRA_WIDTH);
+            int height = extras.getInt(EXTRA_HEIGHT);
+
+            editTextWidth.setText(String.valueOf(width));
+            editTextHeight.setText(String.valueOf(height));
+        }
     }
 
     public void done(View view) {
